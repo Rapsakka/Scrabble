@@ -165,17 +165,3 @@ if __name__ == '__main__':
             inp = input("do you want another resuly? Y/N")
             if inp == "N":
                 break
-    """
-    word = "aeiikklss"
-    combs = search(word,dic) #
-    words = []
-    for c in combs:
-        if dic[breakDown(c)] not in words:
-            words.append( dic[breakDown(c)] )
-    wordsF = [item for sub_list in words for item in sub_list] #kaikki mahdolliset sanat
-    potentials = combine( wordsF ,word )
-    comb = []
-    for pot in potentials:
-        print(pot)
-        comb.append( connect(pot) )
-    """
