@@ -1,5 +1,6 @@
 import time
 import itertools
+from graphics import *
 
 class Word:
     def __init__( self,word ):
@@ -145,6 +146,20 @@ def routine(word,dic): #aeiiisssmpykkll # 15 char
     results = combine(words, word)
     return results
 
+def render(words):
+    longest = 0
+    sLongest = 0
+    words.sort(key= lambda el: len(el.word))
+    words.reverse()
+    longest = len( words[0].word)
+    sLongest = len(words[1].word)
+    width = 210*sLongest
+    height = 210*longest
+    win = GraphWin("Words",width,height)
+
+    ### need to implement the char by char visualisation
+
+
 if __name__ == '__main__':
     sanat = scrap()
     dic = {}
@@ -158,9 +173,10 @@ if __name__ == '__main__':
         fits = routine(word,dic)
         long = sorted(fits, key=len ,  reverse = True) # True many words, False few words
         for fit in long:
-            print("parit")
+            print("Possible word combinations")
             for f in fit:
                 print(f)
+            render(fit)
 
             inp = input("do you want another resuly? Y/N")
             if inp == "N":
