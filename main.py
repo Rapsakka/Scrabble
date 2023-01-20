@@ -9,6 +9,7 @@ class Word:
         #self.neighbours = neighbours # Touple of neighbours i.e. other words and pivot chars i.e. conjuction point of words.
         self.pivot = self.pivots()
         self.connceted = False
+        self.drawn = False
 
     def pivots(self):
         pivots = list()
@@ -50,7 +51,6 @@ def scrap() :
     sanat = []
     for i in range(0,12):
         w = str(f.readline())
-
     while w != '':
         w = str(f.readline())
         c = w
@@ -92,7 +92,6 @@ def search(sana,dic): # all letter subsets that make up a word
                 for w in dic[breakDown(subset)]:
                     if w not in words:
                         words.append( w )
-
     return words
 
 def combine(words,word): # yhdistelee sanoja jotta voidaan verrata taajuksia.
@@ -105,7 +104,7 @@ def combine(words,word): # yhdistelee sanoja jotta voidaan verrata taajuksia.
             ws = [] #list of acceptable subsets
             whole = ""
             flag = True
-            subs = [Word(s) for s in subset ]
+            subs = [Word(s) for s in subset ] #here strings are formed to words
             for pairs in itertools.combinations(subs, 2):
                 connect(pairs)
             for sub in subs:
@@ -117,12 +116,9 @@ def combine(words,word): # yhdistelee sanoja jotta voidaan verrata taajuksia.
                 ws.append(s)
                 if s.connceted == False:
                     flag = False
-
             if ( len (whole)  == len(word) ):
-
                 a = str(alphas(word)).lower()
                 b = str( alphas(whole) ).lower()
-
                 if a == b and flag == True:
                     matches.append(ws)
                     if len(matches) > 20:
@@ -132,13 +128,11 @@ def combine(words,word): # yhdistelee sanoja jotta voidaan verrata taajuksia.
 def connect(pair): # jos connectissa haluaa jotain muuttaa kannattaa muuttaa Word luokan metodeja
     p1 = pair[0]
     p2 = pair[1]
-
     for char, i in zip(  p1.word, range( 0,len(p1.word) ) ) :
         if char in p2.available and (not p2.connceted or not p1.connceted) :
             e = p2.available.index( char )
             if p1.makeNeigbour( p2 ,char, i ) and p2.makeNeigbour( p1, char, e ):
                 p2.disconnect(char)
-
     return (p1,p2)
 
 def routine(word,dic): #aeiiisssmpykkll # 15 char
@@ -153,12 +147,50 @@ def render(words):
     words.reverse()
     longest = len( words[0].word)
     sLongest = len(words[1].word)
-    width = 210*sLongest
-    height = 210*longest
+    height = 150*sLongest    # korkeus
+    width = 150*longest    #leveys
     win = GraphWin("Words",width,height)
+    print()
+    for pairs in itertools.combinations(words, 2):
+        X = defineConjuction( ( pairs[0] , pairs[1] ) )
+        Y = defineConjuction( ( pairs[1] , pairs[0] ) )
+        if X[0] and Y[0]:
+            if not pairs[0].drawn:
+                for (char, place) in zip(pairs[0].word, range(0, len(pairs[0].word))):
+                    name2 = "{charecter2}.gif".format(charecter2=pairs[0].word[place].upper())
+                    img = Image(Point(120 + 120 * place, Y[1] * 120), name2)
+                    img.draw(win)
+                print(pairs[0].word)
+                pairs[0].drawn = True
+            if not pairs[1].drawn:
+                for (char,place) in zip( pairs[1].word, range(0,len(pairs[1].word) )):
+                    name = "{charecter}.gif".format(charecter = pairs[1].word[place].upper())
+                    print(X[1]*120)
+                    print(120+120*place)
+                    img = Image( Point( X[1]*120, 120+120*place ), name )
+                    img.draw(win)
+                pairs[1].drawn = True
+            pairs[0].pivot[X[1] - 1] = False
+            pairs[1].pivot[Y[1] - 1] = False
+            print(pairs[1].word)
+            print()
+    inp = input("close the grapichs Y/N?")
+    while not inp == "Y" :
+        inp = input("close the grapichs Y/N?")
 
-    ### need to implement the char by char visualisation
+    win.close
 
+def defineConjuction(pWords):
+    word1 = pWords[0]
+    word2 = pWords[1]
+    pivot1 = zip(word1.pivot,range(0,len(word1.pivot)) )
+    pivot2 = zip(word2.pivot, range(0, len(word2.pivot)))
+    for p1 in pivot1:
+        if p1[0] :
+            for p2 in pivot2:
+                if p2[0]  and word1.word[ p1[1] ] == word2.word[ p2[1] ]:
+                    return (True, p1[1]+1  )
+    return (False,-1)
 
 if __name__ == '__main__':
     sanat = scrap()
@@ -177,7 +209,7 @@ if __name__ == '__main__':
             for f in fit:
                 print(f)
             render(fit)
-
             inp = input("do you want another resuly? Y/N")
             if inp == "N":
                 break
+
